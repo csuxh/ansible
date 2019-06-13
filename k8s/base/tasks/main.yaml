@@ -1,0 +1,84 @@
+- name: create dir
+  shell: mkdir -p {{ item }}
+  with_items: [/opt/k8s/bin, /opt/k8s/work, /etc/kubernetes/cert, /etc/etcd/cert, /data/k8s/etcd/data, /data/k8s/etcd/wall]
+
+- name: env config
+  template: src=environment.j2 dest=/data/k8s/environment.sh
+
+- name: config hostname
+  hostname: name={{ hostname }}
+
+- name: cp network config
+  template: src=interfaces.j2 dest=/etc/network/interfaces owner=root group=root mode=644
+
+- name: copy /etc/hosts files
+  template: src=hosts.j2 dest=/etc/hosts owner=root group=root mode=644 
+ 
+  #- name: restart network service
+  #service: name=networking state=started 
+
+- name: create user docker
+  user:
+      name: docker
+      createhome: no
+      state: present
+
+#- name: update env path
+#  raw: mkdir -p /opt/k8s/bin /data/k8s | echo 'PATH=/opt/k8s/bin:$PATH' >> /root/.bashrc | source /root/.bashrc 
+
+- name: install package
+  apt: name={{ item }} state=latest
+  with_items:
+      - conntrack
+      - ipvsadm 
+      - ipset 
+      - jq 
+      - sysstat
+  notify: modeprobe
+
+- name: kernel config
+  copy: src=files/kubernetes.conf dest=/data/k8s/kubernetes.conf
+  notify:
+      sysctl
+
+#安装cfssl工具      
+- name: install cfssl
+  copy: src={{ item.src }}  dest={{ item.dest }} mode=744
+  with_items:
+      - src: ../packages/cfssl_linux-amd64
+        dest: /opt/k8s/bin/cfssl
+      - src: ../packages/cfssl-certinfo_linux-amd64
+        dest: /opt/k8s/bin/cfssl-certinfo
+      - src: ../packages/cfssljson_linux-amd64
+        dest: /opt/k8s/bin/cfssljson
+
+# step2 部署CA证书
+- name: distribute kuberntes ca
+  copy: src={{ item.src }} dest={{ item.dest }} mode=644
+  with_items:
+      - src: ../packages/ca.pem
+        dest: /etc/kubernetes/cert/ca.pem
+      - src: ../packages/ca.csr
+        dest: /etc/kubernetes/cert/ca.csr
+      - src: ../packages/ca-key.pem
+        dest: /etc/kubernetes/cert/ca-key.pem
+ 
+- name: admin ca
+  copy: src={{ item.src }} dest={{ item.dest }} mode=644
+  with_items:
+      - src: ../packages/admin.pem
+        dest: /etc/kubernetes/cert/admin.pem
+      - src: ../packages/admin-key.pem
+        dest: /etc/kubernetes/cert/admin-key.pem
+# step3 安装kubectl
+- name: install kubectl
+  copy: src=../packages/kubernetes/client/bin/kubectl dest=/opt/k8s/bin/kubectl mode=744
+
+# step4 部署etcd
+- name: install etcd
+  copy: src={{ item.src }} dest={{ item.dest }} mode=744
+  with_items:
+      - src: ../packages/etcd-v3.3.13-linux-amd64/etcdctl
+        dest: /opt/k8s/bin/etcdctl
+      - src: ../packages/etcd-v3.3.13-linux-amd64/etcd
+        dest: /opt/k8s/bin/etcd

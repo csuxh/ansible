@@ -1,0 +1,9 @@
+---
+- hosts: all
+  gather_facts: False
+  tasks:
+      - name: debug loops
+        debug: msg="Loop in {{ item.key }} :  {{ item.value }}"
+        with_items:
+            - {key: test1, value: 111}
+            - {key: test2, value: 222}

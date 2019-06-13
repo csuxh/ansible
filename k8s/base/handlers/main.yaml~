@@ -1,0 +1,5 @@
+- name: modeprobe
+  raw: modeprobe ip_vs | modeprobe br_netfilter
+
+- name: sysctl
+  shell: sysctl -p /data/k8s/kubernetes.conf

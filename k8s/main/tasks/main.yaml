@@ -1,0 +1,61 @@
+- name: copy kube-src
+  copy: src=../kubernetes-server/kubernetes-src.tar.gz dest=/data/k8s/kubernetes-src.tar.gz
+  notify: 
+      unzip kube-src
+
+- name: copy kube-bin
+  shell: scp files/kubernetes-server/server/bin/{{ item }} root@{{ inventory_hostname }}:/opt/k8s/bin/
+  #args:
+  #    chdir: files/kubernetes-server/server/bin
+  with_items:
+      [apiextensions-apiserver,cloud-controller-manager,kube-apiserver,kube-controller-manager,kube-proxy,kube-scheduler,kubeadm,kubelet,mounter]
+ 
+- name: copy kube-bin
+  raw: scp ../kubernetes-server/server/bin/{apiextensions-apiserver,cloud-controller-manager,kube-apiserver,kube-controller-manager,kube-proxy,kube-scheduler,kubeadm,kubelet,mounter} root@{{ inventory_hostname }}:/opt/k8s/bin/ | chmod +x /opt/k8s/bin/*
+
+
+- name: kube-apiserver service
+  template: src=kube-apiserver.service.j2 dest=/etc/systemd/system/kube-apiserver.service
+  tags:
+      apiserver-service
+- name: kube-apiserver token
+  copy: src=files/token.csv dest=/etc/kubernetes/cert/token.csv
+
+- name: kube-apiserver daemon-reload
+  shell: systemctl daemon-reload
+  tags: daemon-reload
+
+- name: kube-controller-manager config
+  copy: src=files/kube-controller-manager.kubeconfig dest=/etc/kubernetes/kube-controller-manager.kubeconfig
+
+- name: kube-controller-manager service
+  template: src=kube-controller-manager.service.j2 dest=/etc/systemd/system/kube-controller-manager.service
+
+- name: mkdir
+  shell: mkdir -p /data/k8s/k8s/kube-controller-manager
+
+- name: mkdir kube-scheduler
+  shell: mkdir -p /data/k8s/k8s/kube-scheduler 
+  
+- name: kube-scheduler config
+  copy: src=files/kube-scheduler.kubeconfig dest=/etc/kubernetes/kube-scheduler.kubeconfig
+  tags: 
+      kube-scheduler-config
+
+- name: kube-scheduler yaml
+  template: src=kube-scheduler.yaml.j2 dest=/etc/kubernetes/kube-scheduler.yaml
+
+- name: kube-scheduler service
+  template: src=kube-scheduler.service.j2 dest=/etc/systemd/system/kube-scheduler.service
+  notify:
+      daemon-reload
+
+# 需要将docker0网络配成flannel的子网
+- name: docker network config
+  raw: echo "source /run/flannel/docker" >> /root/.bashrc
+  tags: docker
+
+- name: docker service config
+  copy: src=files/docker.service dest=/lib/systemd/system/docker.service
+  notify: deamon-reload
+  tags: docker

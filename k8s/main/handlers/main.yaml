@@ -1,0 +1,5 @@
+- name: unzip kube-src
+  shell: cd /data/k8s; tar zxf kubernetes-src.tar.gz 
+
+- name: daemon-reload
+  shell: systemctl daemon-reload

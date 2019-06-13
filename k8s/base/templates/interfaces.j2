@@ -1,0 +1,7 @@
+auto enp0s5
+iface enp0s5 inet static
+address {{ inventory_hostname }}
+netmask 255.255.255.0
+gateway 10.211.55.1
+
+dns-nameserver 8.8.8.8

@@ -1,0 +1,23 @@
+---
+- name: Install zabbix-server
+  yum: name={{ item }} state=latest
+  with_items:
+      - zabbix-server
+      - zabbix-server-mysql
+      - zabbix-web-mysql
+- name: Init Mysql
+  shell: mysql_install_db
+
+- name: Start Mysql
+  service: name=mysqld state=started enable=yes
+
+- name: set mysql admin passwd
+  shell: /usr/bin/mysqladmin -uroot passwd 'xiahang'
+
+- name: create zabbix master database
+  shell: mysql -uroot -pxiahang -e 'create database zabbix_master;'
+
+- name: set grant
+  shell: mysql -uroot -pxiahang -e 'grant all privileges on zabbix_master.* to zabbix@localhost identified by "zabbix";'
+
+# ....

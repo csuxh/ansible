@@ -1,0 +1,9 @@
+10.211.55.20 key=kube-node1
+10.211.55.21 key=kube-node2
+10.211.55.22 key=kube-node3
+
+#[k8s]
+#10.211.55.1[0:2]
+
+#[k8s:vars]
+#data_dir=/data/k8s

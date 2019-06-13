@@ -1,0 +1,14 @@
+---
+- hosts: all
+  gather_facts: False
+  vars:
+      cluster:
+          node1:
+              name: db01
+              ip: 192.168.0.1
+          node2:
+              name: db02
+              ip: 192.168.0.2
+  tasks:
+      - name: debug loops
+        debug: msg="Node--- {{ cluster.node1 }} Node_IP---  {{ cluster.node1.ip }}"

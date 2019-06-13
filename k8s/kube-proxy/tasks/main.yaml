@@ -1,0 +1,10 @@
+- name: kube-proxy dir
+  shell: mkdir -p /data/k8s/kube-proxy
+
+- name: kube-proxy config
+  template: src=kube-proxy-config.yaml.j2 dest=/etc/kubernetes/kube-proxy-config.yaml
+
+- name: kubelet service
+  copy: src=files/kube-proxy.service dest=/etc/systemd/system/kube-proxy.service
+  notify:
+      daemon-reload

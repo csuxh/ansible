@@ -1,0 +1,6 @@
+---
+- hosts: all
+  gather_facts: False
+  tasks:
+      - name: display variables from hostfile
+        debug: msg="Name of {{ inventory_hostname }} is {{ key }}"

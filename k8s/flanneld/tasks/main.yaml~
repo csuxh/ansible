@@ -1,0 +1,29 @@
+- name: install flannel
+  copy: src={{ item.src }}  dest={{ item.dest }} mode=744
+  with_items:
+      - src: packages/flannel/flanneld
+        dest: /opt/k8s/bin/flanneld
+      - src: packages/flannel/mk-docker-opts.sh
+        dest: /opt/k8s/bin/mk-docker-opts.sh
+
+- name: copy flannel ca
+  copy: src={{ item.src }} dest={{ item.dest }} mode=644
+  with_items:
+      - src: ../packages/flanneld.pem
+        dest: /etc/flanneld/cert/flanneld.pem
+      - src: ../packages/flanneld-key.pem
+        dest: /etc/flanneld/cert/flanneld-key.pem
+
+- name: flannel service
+  copy: src=../packages/flanneld.service dest=/etc/systemd/system/flanneld.service
+  #  notify:
+  #   start flannel
+  #
+  #
+- name: copy config
+  copy: src={{ item.src }} dest={{ item.dest }}
+  with_items:
+      - src: files/flannel.config
+        dest: /etc/flanneld/config/flannel.config
+      - src: files/flanneld.service
+        dest: /etc/systemd/system/flanneld.service

@@ -1,0 +1,8 @@
+---
+- hosts: all
+  gather_facts: False
+  roles:
+      - { role: base, tags: base }
+      - { role: zabbix-agent, tags: agent }
+        #- { role: zabbix-server, when "'zabbix-server' in group_names", tags: server }
+        #- { role: zabbix-proxy, when "'zabbix-proxy' in group_names", tags: proxy }

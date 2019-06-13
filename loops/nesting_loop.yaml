@@ -1,0 +1,9 @@
+---
+- hosts: all
+  gather_facts: False
+  tasks:
+      - name: debug loops
+        debug: msg="Loop in key--- {{ item[0] }} value---  {{ item[1] }}"
+        with_nested:
+            - ['key1']
+            - ['value1', 'value2', 'value3']

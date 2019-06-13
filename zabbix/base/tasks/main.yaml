@@ -1,0 +1,28 @@
+---
+- name: set hostname
+  hostname: name={{ hostname }}
+
+#- name: Change network files
+#  shell: sed -i "s/HOSTNAME=.*/HOSTNAME={{ hostname }}/g" /etc/sysconfig/network
+
+- name: stop Iptables
+  service: name=iptables state=stopped enable=no
+  ignore_errors: yes
+
+- name: disable selinux
+  shell: /usr/sbin/setenforce 0 && sed -i 's/SELINUX=enforcing/SELINUX=diabled/g' /etc/sysconfig/selinux
+  ignore_errors: yes
+
+#- name: Install libselinux-python
+#  raw: yum install libselinux-python -y
+
+- name: create data dir
+  file:
+      path: "{{ data_dir }}"
+      state: directory
+      # when: is_metal | bool
+  tags:
+      - base-dir
+
+- name: copy /etc/hosts files
+  template: src=hosts.j2 dest=/etc/hosts owner=root group=root mode=644

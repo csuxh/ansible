@@ -1,0 +1,10 @@
+---
+- hosts: all
+  gather_facts: False
+  roles:
+      - { role: base, tags: base }
+      - { role: etcd, tags: etcd }
+      - { role: flanneld, tags: network }
+      - { role: nginx, tags: nginx }
+      - { role: main, tags: install-kube }
+      - { role: kubelet, tags: kubelet }

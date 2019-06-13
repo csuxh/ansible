@@ -1,0 +1,25 @@
+- name: copy nginx file
+  copy: src=files/nginx-{{ nginx_version }}.tar.gz dest=/data/k8s/nginx.tar.gz
+
+- name: unzip nginx
+  shell: cd /data/k8s; tar zxf nginx.tar.gz -C /opt/k8s/work
+
+- name: configure nginx
+  shell: cd /opt/k8s/work/nginx-{{ nginx_version }};mkdir nginx-prefix;./configure --with-stream --without-http --prefix=$(pwd)/nginx-prefix --without-http_uwsgi_module --without-http_scgi_module --without-http_fastcgi_module
+
+- name: make install
+  shell: cd /opt/k8s/work/nginx-{{ nginx_version }};make && make install
+
+
+- name: install nginx bin 
+  raw: cp /opt/k8s/work/nginx-{{ nginx_version }}/nginx-prefix/sbin/nginx /opt/k8s/kube-nginx/sbin/kube-nginx;chmod a+x /opt/k8s/kube-nginx/sbin/*
+
+  #- name: nginx config
+  #  copy: src=files/kube-nginx.conf dest=/opt/k8s/kube-nginx/conf/kube-nginx.conf
+
+- name: nginx config
+  template: src=kube-nginx.conf.j2 dest=/opt/k8s/kube-nginx/conf/kube-nginx.conf
+
+- name: nginx service
+  copy: src=files/kube-nginx.service dest=/etc/systemd/system/kube-nginx.service
+  notify: start nginx

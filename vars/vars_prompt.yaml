@@ -1,0 +1,16 @@
+---
+- hosts: all
+  gather_facts: False
+  vars_prompt:
+      - name: "var1"
+        prompt: "Pls input vars 1: "
+        private: no
+      - name: "var2"
+        prompt: "Please input vars 2: "
+        default: "default2"
+        private: yes
+  tasks:
+      - name: display vars1
+        debug: msg="var1 is {{ var1 }}"
+      - name: display variable
+        debug: msg="var2 is {{ var2 }}"

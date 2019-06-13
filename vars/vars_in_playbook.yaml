@@ -1,0 +1,8 @@
+---
+- hosts: all
+  gather_facts: False
+  vars:
+      service_name: Nginx
+  tasks:
+      - name: display variables from hostfile
+        debug: msg="Name of {{ inventory_hostname }} is {{ service_name }}"

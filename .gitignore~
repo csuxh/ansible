@@ -1,0 +1,11 @@
+images
+.DS_Store
+ansible/packages/kubernetes-client-linux-amd64.tar.gz
+ansible/packages/flannel/flannel-v0.11.0-linux-amd64.tar.gz
+*.tgz
+ansible/packages/etcd-v3.3.13-linux-amd64.tar.gz
+ansible/nginx/files/nginx-1.15.3.tar.gz
+ansible/kubernetes-server/kubernetes-src.tar.gz
+ansible/kubernetes-server-linux-amd64.tar.gz
+ansible/packages/*
+ansible/kubernetes-server

@@ -1,0 +1,5 @@
+---
+zabbix_server: 10.211.55.20
+zabbix_proxy: 10.211.55.21
+ansible_ssh_user: root
+data_dir: /data

@@ -1,0 +1,9 @@
+---
+- hosts: all
+  gather_facts: False
+  tasks:
+      - name: register variable
+        shell: hostname
+        register: info
+      - name: display variable
+        debug: msg="Result is {{ info.stdout }}"

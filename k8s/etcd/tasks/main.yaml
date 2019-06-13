@@ -1,0 +1,23 @@
+# step4 部署etcd
+- name: install etcd
+  copy: src={{ item.src }} dest={{ item.dest }} mode=744
+  with_items:
+      - src: ../packages/etcd-v3.3.13-linux-amd64/etcdctl
+        dest: /opt/k8s/bin/etcdctl
+      - src: ../packages/etcd-v3.3.13-linux-amd64/etcd
+        dest: /opt/k8s/bin/etcd
+
+- name: copy etcd ca 废弃
+  copy: src={{ item.src }} dest={{ item.dest }} mode=644
+  with_items:
+      - src: ../packages/etcd.pem
+        dest: /etc/etcd/cert/etcd.pem
+      - src: ../packages/etcd-key.pem
+        dest: /etc/etcd/cert/etcd-key.pem
+
+- name: etcd config
+  template: src=etcd.conf.j2 dest=/etc/etcd/etcd.conf mode=644
+ 
+- name: etcd service
+  copy: src=files/etcd.service dest=/etc/systemd/system/etcd.service
+  notify: start etcd

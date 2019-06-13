@@ -1,0 +1,7 @@
+---
+- hosts: all
+  gather_facts: False
+  tasks:
+      - name: test sequence
+        debug: msg="id--- {{ item }}"
+        with_sequence: start=0 end=5 format=user%02d

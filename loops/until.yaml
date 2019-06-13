@@ -1,0 +1,11 @@
+---
+- hosts: all
+  gather_facts: False
+  tasks:
+      - name: test Until
+        shell: cat /Users/csuxh/Downloads/学习/ansible/host1
+        register: host_list
+        #debug: msg="output--- host_list.stdout"
+        until: host_list.stdout.startswith("master")
+        retries: 5
+        delay: 5

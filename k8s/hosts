@@ -1,0 +1,5 @@
+[k8s]
+10.211.55.20 ansible_ssh_user=root hostname=kube-node1
+10.211.55.21 ansible_ssh_user=root hostname=kube-node2
+10.211.55.22 ansible_ssh_user=root hostname=kube-node3
+

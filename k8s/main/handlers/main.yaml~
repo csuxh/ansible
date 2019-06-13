@@ -1,0 +1,2 @@
+- name: unzip kube-src
+  shell: cd /data/k8s; tar zxf kubernetes-src.tar.gz 

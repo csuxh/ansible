@@ -1,0 +1,6 @@
+[zabbix-server]
+10.211.55.20 hostname=kube-node1
+[zabbix-proxy]
+10.211.55.21 hostname=kube-node2
+[zabbix-agent]
+10.211.55.22 hostname=kube-node3
