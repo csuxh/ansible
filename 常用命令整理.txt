@@ -1,7 +1,0 @@
-ansible storm_cloud -m synchronize -a "src=/root/ dest=/data/ansible_test/ rsync_opts='--exclude=RTDATA' " -i "123.59.33.132,"
-
-ansible-doc -s synchronize
-
-ansible test -m synchronize -a "mode=pull src=/root/ifcfg-ens37 dest=/data/ansible/ rsync_opts='-abvzP'"
-
-ansible-playbook download_config.yaml  --limit 10.25.2.231  

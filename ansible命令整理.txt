@@ -1,0 +1,133 @@
+ansible storm_cloud -m synchronize -a "src=/root/ dest=/data/ansible_test/ rsync_opts='--exclude=RTDATA' " -i "123.59.33.132,"
+
+ansible-doc -s synchronize
+
+ansible test -m synchronize -a "mode=pull src=/root/ifcfg-ens37 dest=/data/ansible/ rsync_opts='-abvzP'"
+
+ansible-playbook download_config.yaml  --limit 10.25.2.231  
+
+
+Ad-hoc命令：
+ansible k8s -m shell -a 'hostname' -o
+
+ansible k8s -m copy -a 'src=./ dest=/opt/k8s/bin mode=755 backup=yes' -o
+
+changehosename.yml
+- hosts : testall
+  remote_user : root
+  tasks :
+  - name : show hostname
+    shell : hostname
+  - name : show ip
+    command : ip a
+  - hostname : name=web{{ ansible_default_ipv4.address.split('.')[-1] }}        
+
+
+  ansible-playbook changehostname.yml
+
+
+  ansible-playbook --syntax-check / --list-task --list-hosts  
+
+  -i hosts xxx.yaml --start-at-task='Copy Nginx.conf'  指定task运行
+
+第4章：
+一. 变量
+1. hosts内定义变量
+2. 组变量和主机变量  group_vars/host_vars
+3. 全局变量
+  ansible-playbook -i host2 test_vars.yaml -e "key=Nginx"
+4. 文件传参 yaml或json
+ansible-playbook -i host2 test_vars.yaml -e "@var.json"
+5. playbook文件内实用vars、vars_files
+  vars:
+      service_name: Nginx    引用{{ service_name }}
+  vars_files:
+     - var.yaml              引用： {{ .key }}
+6. register 内置变量： task之间传递数据
+- hosts: all
+  gather_facts: False
+  tasks:
+      - name: register variable
+        shell: hostname
+        register: info
+      - name: display variable
+        debug: msg="Result is {{ info.stdout }}"
+ 7. vars_prompt：输入变量  默认值，是否显示，是否加密
+  vars_prompt:
+      - name: "var1"
+        prompt: "Pls input vars 1: "
+        private: no
+      - name: "var2"
+        prompt: "Please input vars 2: "
+        default: "default2"
+        private: yes
+ ansible-playbook vars_register.yaml -l 10.211.55.2
+
+二. 循环 
+1.标准with_items
+- name: debug loops
+        debug: msg="Loop in key--- {{ item.key }} value---  {{ item.value }}"
+        with_items:
+            - {key: test1, value: 111}
+            - {key: test2, value: 222}
+2.嵌套with_nested：
+- name: debug loops
+        debug: msg="Loop in key--- {{ item[0] }} value---  {{ item[1] }}"
+        with_nested:
+            - ['key1']
+            - ['value1', 'value2', 'value3']
+3.散列loop(字典) with_dict
+      - name: debug loops
+        debug: msg="Node--- {{ item.key }} Node_IP---  {{ item.value.ip }}"
+        with_dict: "{{ cluster }}"
+4.with_fileglob: 文件匹配loops
+- hosts: all
+  gather_facts: False
+  tasks:
+      - name: debug loops
+        debug: msg="files list---> {{ item }}"
+        with_fileglob:
+            - ../vars/*
+ 5. with_random_choice: 随机选择
+ 6. 条件判断：register, retries, delay
+ tasks:
+      - name: test Until
+        shell: cat /Users/csuxh/Downloads/学习/ansible/host1
+        register: host_list
+        #debug: msg="output--- host_list.stdout"
+        until: host_list.stdout.startswith("master")
+        retries: 5
+        delay: 5
+ 7. register loops: 接收多个task作为临时变量传给register
+ 8. with sequence:
+ 9. Lookups:
+
+
+
+ 综合：
+ ➜  zabbix  more site.yaml
+---
+- hosts: all
+  gather_facts: False
+  roles:
+      - { role: base, tags: base }
+      - { role: zabbix-agent, tags: agent }
+      - { role: zabbix-server, when "'zabbix-server' in group_names", tags: server }
+      - { role: zabbix-proxy, when "'zabbix-proxy' in group_names", tags: proxy }
+
+ --tags根据tags选择执行的任务
+ --step 分步执行，逐个确认
+ ignore_errors: yes 跳过错误
+ --check ： dry run模式
+ ansible-playbook -i hosts site.yaml --tags base --start-at-task="copy /etc/hosts files"  --step
+
+
+
+ JINJIA2:
+ ➜  zabbix  more base/templates/hosts.j2
+127.0.1.1   {{ hostname }}
+{% for host in groups['all']  %}
+{{ hostvars[host]['inventory_hostname'] }}    {{ hostvars[host]['hostname'] }}
+{% endfor %}
+    for
+
