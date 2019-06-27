@@ -109,7 +109,9 @@ ansible test -m synchronize -a "mode=pull src=/root/ifcfg-ens37 dest=/data/ansib
 ansible test -m fetch -a "src=/root/ifcfg-ens37 dest=/data/ansible/"
 ansible-playbook download_config.yaml  --limit 10.25.2.231  
 
+ansible 192.168.152.129 -m fetch -a "src=/root/ifcfg-ens37 dest=/data/nagios/{{ inventory_hostname }}.cfg flat=yes "  -- 重新命名
 
+ansible-doc -s fetch
 
  综合：
  ➜  zabbix  more site.yaml
